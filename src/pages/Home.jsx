@@ -1,134 +1,156 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { Github, FileText, Mail, ArrowRight, ExternalLink } from 'lucide-react';
+import { Github, FileText, ExternalLink, Folder } from 'lucide-react';
 import { projects } from '../data/projects';
 
 const ProjectCard = ({ project }) => {
     return (
         <motion.div
-            whileHover={{ scale: 1.05, y: -10 }}
-            className="w-[350px] h-[450px] flex-shrink-0 relative rounded-[2rem] overflow-hidden cursor-pointer group"
-            style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-            }}
+            whileHover={{ y: -7 }}
+            className="w-[325px] h-[350px] flex-shrink-0 relative rounded bg-light-navy hover:-translate-y-2 transition-all duration-300 shadow-xl cursor-pointer group px-7 py-8 flex flex-col justify-between"
         >
-            {/* Animated Gradient Background */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${project.imageColor} opacity-20 group-hover:opacity-30 transition-opacity duration-500`} />
-
-            {/* Shine Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transform transition-transform" />
-
-            {/* Content */}
-            <div className="absolute inset-0 p-8 flex flex-col justify-between z-10">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${project.imageColor} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <project.icon size={32} className="text-white" />
+            <div className="flex justify-between items-center mb-8">
+                <div className="text-green">
+                    <Folder size={40} strokeWidth={1} />
                 </div>
-
-                <div>
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:translate-x-1 transition-transform">{project.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-3">
-                        {project.shortDescription}
-                    </p>
-
-                    <div className="flex items-center gap-2 text-blue-400 font-semibold text-sm group-hover:gap-3 transition-all">
-                        Explore Project <ArrowRight size={16} />
-                    </div>
+                <div className="flex gap-4 text-light-slate">
+                    <ExternalLink size={22} className="hover:text-green transition-colors" />
                 </div>
             </div>
+
+            <div>
+                <h3 className="text-xl font-bold text-lightest-slate mb-3 group-hover:text-green transition-colors">{project.title}</h3>
+                <div className="text-light-slate text-[17px] leading-relaxed mb-6 line-clamp-4">
+                    {project.shortDescription}
+                </div>
+            </div>
+
+            <ul className="flex flex-wrap gap-3 mt-auto list-none p-0">
+                {project.stats.map((stat, i) => (
+                    <li key={i} className="text-xs font-mono text-slate">
+                        {stat.value}
+                    </li>
+                ))}
+            </ul>
         </motion.div>
     );
 };
 
 const Home = () => {
-    // Duplicate projects to create seamless loop
-    const carouselItems = [...projects, ...projects, ...projects];
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const carouselItems = [...projects, ...projects, ...projects, ...projects];
     const controls = useAnimationControls();
 
+    // Spotlight Effect
+    useEffect(() => {
+        const updateMousePosition = (e) => {
+            setMousePosition({ x: e.clientX, y: e.clientY });
+        };
+        window.addEventListener('mousemove', updateMousePosition);
+        return () => window.removeEventListener('mousemove', updateMousePosition);
+    }, []);
+
+    // Infinite Scroll
     useEffect(() => {
         controls.start({
             x: "-50%",
             transition: {
-                duration: 40,
+                duration: 80,
                 ease: "linear",
                 repeat: Infinity,
             }
         });
     }, [controls]);
 
+    // Stagger Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.3,
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 overflow-x-hidden">
+        <div className="min-h-screen bg-navy text-slate font-sans relative overflow-x-hidden">
 
-            {/* Background Texture */}
-            <div className="fixed inset-0 z-0">
-                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px]" />
-            </div>
+            {/* Spotlight Overlay */}
+            <div
+                className="pointer-events-none fixed inset-0 z-30 transition duration-300 lg:absolute"
+                style={{
+                    background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(29, 78, 216, 0.07), transparent 80%)`
+                }}
+            />
 
-            {/* Content Container */}
-            <div className="relative z-10 flex flex-col min-h-screen">
+            <div className="relative z-40 flex flex-col min-h-screen max-w-[1600px] mx-auto px-6 md:px-12 lg:px-36">
 
                 {/* Hero Section */}
-                <main className="flex-1 flex flex-col justify-center items-center text-center px-4 pt-20 pb-12">
+                <main className="flex-1 flex flex-col justify-center items-start text-left min-h-screen pb-32">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="mb-6 inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-medium tracking-wide uppercase"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="max-w-[1000px]"
                     >
-                        Portfolio 2026
-                    </motion.div>
+                        <motion.div variants={itemVariants} className="font-mono text-green text-base mb-5 ml-1">
+                            Hi, my name is
+                        </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
-                        className="font-display text-6xl md:text-8xl font-black mb-6 tracking-tight bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
-                    >
-                        Mohammed<br />Roowala
-                    </motion.h1>
+                        <motion.h1 variants={itemVariants} className="text-[clamp(40px,8vw,80px)] font-bold text-lightest-slate leading-[1.1] mb-2 tracking-tight">
+                            Mohammed Roowala.
+                        </motion.h1>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-xl md:text-2xl text-slate-400 max-w-2xl mb-12 leading-relaxed"
-                    >
-                        Building autonomous agents, high-fidelity dashboards, and digital experiences that feel alive.
-                    </motion.p>
+                        <motion.h2 variants={itemVariants} className="text-[clamp(40px,8vw,80px)] font-bold text-slate leading-[0.9] mb-8">
+                            I build things for the web.
+                        </motion.h2>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className="flex gap-4 items-center justify-center mb-20"
-                    >
-                        <a href="https://github.com/momoroowala" target="_blank" className="px-8 py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
-                            <Github size={20} /> GitHub
-                        </a>
-                        <button className="px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition-colors flex items-center gap-2 backdrop-blur-md">
-                            <FileText size={20} /> Resume
-                        </button>
+                        <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate max-w-[540px] mb-12 leading-relaxed">
+                            I'm a software engineer specializing in building (and occasionally designing) exceptional digital experiences. Currently, I'm focused on building accessible, human-centered products at <span className="text-green">Anti-Automatons</span>.
+                        </motion.p>
+
+                        <motion.div variants={itemVariants} className="flex gap-5">
+                            <a href="https://github.com/momoroowala" target="_blank" className="px-7 py-4 border border-green text-green font-mono text-[14px] rounded bg-transparent hover:bg-green-tint transition-all duration-300">
+                                Check out my GitHub!
+                            </a>
+                        </motion.div>
                     </motion.div>
                 </main>
 
-                {/* Infinite Carousel Section */}
-                <div className="pb-32 w-full overflow-hidden">
-                    <div className="flex justify-center mb-10">
-                        <h2 className="text-2xl font-bold flex items-center gap-3">
-                            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                            Featured Projects
-                        </h2>
-                    </div>
+                {/* Projects Section */}
+                <section className="pb-40 w-full overflow-hidden">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        viewport={{ once: true }}
+                        className="flex items-center gap-4 mb-10 w-full max-w-[1000px] mx-auto md:mx-0"
+                    >
+                        <span className="text-green font-mono text-xl md:text-2xl">01.</span>
+                        <h2 className="text-[26px] md:text-[32px] font-bold text-lightest-slate whitespace-nowrap">Some Things I've Built</h2>
+                        <div className="h-[1px] bg-lightest-navy w-[200px] md:w-[300px] ml-4"></div>
+                    </motion.div>
 
                     <motion.div
-                        className="flex gap-8 px-8 w-max hover:cursor-grab active:cursor-grabbing"
+                        className="flex gap-6 w-max hover:cursor-grab active:cursor-grabbing py-10"
                         animate={controls}
                         onMouseEnter={() => controls.stop()}
-                        onMouseLeave={() => controls.start({ x: "-50%", transition: { duration: 40, ease: "linear", repeat: Infinity } })}
+                        onMouseLeave={() => controls.start({ x: "-50%", transition: { duration: 80, ease: "linear", repeat: Infinity } })}
                     >
                         {carouselItems.map((project, index) => (
                             <NavLink to={`/project/${project.id}`} key={`${project.id}-${index}`}>
@@ -136,7 +158,7 @@ const Home = () => {
                             </NavLink>
                         ))}
                     </motion.div>
-                </div>
+                </section>
             </div>
         </div>
     );
