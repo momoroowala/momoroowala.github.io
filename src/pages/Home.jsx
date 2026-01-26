@@ -1,138 +1,143 @@
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, useAnimationControls } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { ArrowRight, Github, ExternalLink } from 'lucide-react';
+import { Github, FileText, Mail, ArrowRight, ExternalLink } from 'lucide-react';
 import { projects } from '../data/projects';
 
-const ProjectCard = ({ project, isActive, onClick }) => {
+const ProjectCard = ({ project }) => {
     return (
         <motion.div
-            onClick={onClick}
-            layoutId={`card-${project.id}`}
-            className={`
-                relative cursor-pointer rounded-2xl overflow-hidden shrink-0 
-                transition-all duration-500 ease-out
-                ${isActive ? 'w-[600px] h-[400px] shadow-2xl scale-100' : 'w-[300px] h-[300px] shadow-lg scale-90 opacity-60'}
-            `}
+            whileHover={{ scale: 1.05, y: -10 }}
+            className="w-[350px] h-[450px] flex-shrink-0 relative rounded-[2rem] overflow-hidden cursor-pointer group"
             style={{
-                background: `linear-gradient(135deg, ${isActive ? '#1e293b' : '#0f172a'}, #000000)`
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
             }}
         >
-            {/* Background Gradient Mesh */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${project.imageColor} opacity-20`} />
+            {/* Animated Gradient Background */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${project.imageColor} opacity-20 group-hover:opacity-30 transition-opacity duration-500`} />
+
+            {/* Shine Effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transform transition-transform" />
 
             {/* Content */}
-            <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                <motion.div
-                    initial={false}
-                    animate={{ y: isActive ? 0 : 20, opacity: isActive ? 1 : 0.8 }}
-                >
-                    <div className="mb-4 text-white/50">
-                        <project.icon size={isActive ? 48 : 32} />
-                    </div>
-                    <h3 className={`font-bold text-white mb-2 ${isActive ? 'text-4xl' : 'text-2xl'}`}>
-                        {project.title}
-                    </h3>
-                    <p className={`text-white/70 line-clamp-2 ${isActive ? 'text-lg' : 'text-sm'}`}>
+            <div className="absolute inset-0 p-8 flex flex-col justify-between z-10">
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${project.imageColor} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <project.icon size={32} className="text-white" />
+                </div>
+
+                <div>
+                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:translate-x-1 transition-transform">{project.title}</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed mb-6 line-clamp-3">
                         {project.shortDescription}
                     </p>
 
-                    {isActive && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-6 flex items-center gap-2 text-cyan-400 font-semibold"
-                        >
-                            View Details <ArrowRight size={18} />
-                        </motion.div>
-                    )}
-                </motion.div>
+                    <div className="flex items-center gap-2 text-blue-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                        Explore Project <ArrowRight size={16} />
+                    </div>
+                </div>
             </div>
         </motion.div>
     );
 };
 
 const Home = () => {
-    const [activeIndex, setActiveIndex] = useState(1);
-    const scrollContainerRef = useRef(null);
+    // Duplicate projects to create seamless loop
+    const carouselItems = [...projects, ...projects, ...projects];
+    const controls = useAnimationControls();
 
-    const scrollTo = (index) => {
-        setActiveIndex(index);
-    };
+    useEffect(() => {
+        controls.start({
+            x: "-50%",
+            transition: {
+                duration: 40,
+                ease: "linear",
+                repeat: Infinity,
+            }
+        });
+    }, [controls]);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-            <header className="p-8 flex justify-between items-center z-10">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                    Mohammed's Portfolio
-                </h1>
-                <div className="flex gap-4">
-                    <a href="https://github.com/momoroowala" target="_blank" className="p-2 hover:bg-white/10 rounded-full transition">
-                        <Github />
-                    </a>
-                </div>
-            </header>
+        <div className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 overflow-x-hidden">
 
-            <main className="flex-1 flex flex-col justify-center overflow-hidden relative">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950" />
+            {/* Background Texture */}
+            <div className="fixed inset-0 z-0">
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/20 blur-[120px]" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px]" />
+            </div>
 
-                <div className="absolute top-10 left-0 w-full text-center">
-                    <p className="text-blue-400 tracking-widest text-sm font-semibold uppercase mb-2">My Work</p>
-                    <h2 className="text-5xl font-bold">Featured Projects</h2>
-                </div>
+            {/* Content Container */}
+            <div className="relative z-10 flex flex-col min-h-screen">
 
-                {/* Carousel */}
-                <div
-                    className="flex gap-8 items-center px-[50vw] overflow-x-auto no-scrollbar py-20 snap-x snap-mandatory"
-                    ref={scrollContainerRef}
-                    style={{
-                        transform: `translateX(calc(50% - ${activeIndex * 332 + 300}px))`, // Roughly center logic (simplified for prototype)
-                        transition: 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)'
-                    }}
-                >
-                    <div className="flex gap-8 items-center justify-center w-full transition-transform duration-500"
-                        style={{ transform: `translateX(${(1 - activeIndex) * 400}px)` }} // Manual centering calculation hack for React state driven carousel
+                {/* Hero Section */}
+                <main className="flex-1 flex flex-col justify-center items-center text-center px-4 pt-20 pb-12">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="mb-6 inline-block px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-medium tracking-wide uppercase"
                     >
-                        {/* 
-                            Better Logic: Flex container centered in viewport.
-                            We translate the container based on Active Index to keep Active Item in center.
-                         */}
+                        Portfolio 2026
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.1 }}
+                        className="font-display text-6xl md:text-8xl font-black mb-6 tracking-tight bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
+                    >
+                        Mohammed<br />Roowala
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="text-xl md:text-2xl text-slate-400 max-w-2xl mb-12 leading-relaxed"
+                    >
+                        Building autonomous agents, high-fidelity dashboards, and digital experiences that feel alive.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="flex gap-4 items-center justify-center mb-20"
+                    >
+                        <a href="https://github.com/momoroowala" target="_blank" className="px-8 py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-200 transition-colors flex items-center gap-2">
+                            <Github size={20} /> GitHub
+                        </a>
+                        <button className="px-8 py-4 rounded-full bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition-colors flex items-center gap-2 backdrop-blur-md">
+                            <FileText size={20} /> Resume
+                        </button>
+                    </motion.div>
+                </main>
+
+                {/* Infinite Carousel Section */}
+                <div className="pb-32 w-full overflow-hidden">
+                    <div className="flex justify-center mb-10">
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                            Featured Projects
+                        </h2>
                     </div>
-                </div>
 
-                {/* Re-implementing a simpler Centered Flex layout for robustness */}
-                <div className="w-full flex justify-center items-center h-[600px] relative z-10 perspective-1000">
-                    <div className="flex gap-8 items-center transform transition-all duration-500 ease-out"
-                        style={{ transform: `translateX(${(1 - activeIndex) * 400}px)` }} // 400px shift per item roughly
+                    <motion.div
+                        className="flex gap-8 px-8 w-max hover:cursor-grab active:cursor-grabbing"
+                        animate={controls}
+                        onMouseEnter={() => controls.stop()}
+                        onMouseLeave={() => controls.start({ x: "-50%", transition: { duration: 40, ease: "linear", repeat: Infinity } })}
                     >
-                        {projects.map((project, index) => (
-                            <NavLink to={`/project/${project.id}`} key={project.id}>
-                                <div
-                                    className="relative transition-all duration-500"
-                                    onMouseEnter={() => setActiveIndex(index)}
-                                >
-                                    <ProjectCard
-                                        project={project}
-                                        isActive={index === activeIndex}
-                                        onClick={() => setActiveIndex(index)}
-                                    />
-                                </div>
+                        {carouselItems.map((project, index) => (
+                            <NavLink to={`/project/${project.id}`} key={`${project.id}-${index}`}>
+                                <ProjectCard project={project} />
                             </NavLink>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
-
-                {/* Navigation Dots */}
-                <div className="flex justify-center gap-3 mt-8 z-10">
-                    {projects.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => scrollTo(i)}
-                            className={`w-3 h-3 rounded-full transition-all ${i === activeIndex ? 'bg-blue-500 w-8' : 'bg-white/20 hover:bg-white/40'}`}
-                        />
-                    ))}
-                </div>
-            </main>
+            </div>
         </div>
     );
 };
