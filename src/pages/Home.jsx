@@ -1,167 +1,303 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, useAnimationControls } from 'framer-motion';
-import { NavLink } from 'react-router-dom';
-import { Github, FileText, ExternalLink, Folder } from 'lucide-react';
-import { projects } from '../data/projects';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowRight, FileText, Users, TrendingUp, CheckCircle, DollarSign } from 'lucide-react';
 
-const ProjectCard = ({ project }) => {
-    return (
-        <motion.div
-            whileHover={{ y: -7 }}
-            className="w-[325px] h-[350px] flex-shrink-0 relative rounded bg-light-navy hover:-translate-y-2 transition-all duration-300 shadow-xl cursor-pointer group px-7 py-8 flex flex-col justify-between"
-        >
-            <div className="flex justify-between items-center mb-8">
-                <div className="text-green">
-                    <Folder size={40} strokeWidth={1} />
-                </div>
-                <div className="flex gap-4 text-light-slate">
-                    <ExternalLink size={22} className="hover:text-green transition-colors" />
-                </div>
+function Home() {
+  const fadeInUp = {
+    initial: { opacity: 0, y: 60 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  };
+
+  const steps = [
+    {
+      icon: <FileText className="w-8 h-8 text-blue" />,
+      title: "Send Your Data",
+      description: "Upload your QuickBooks export. No customer names needed. Your data is anonymized immediately."
+    },
+    {
+      icon: <TrendingUp className="w-8 h-8 text-blue" />,
+      title: "Get Your Analysis",
+      description: "My system finds dormant customers, calculates revenue at risk, and identifies priority targets."
+    },
+    {
+      icon: <Users className="w-8 h-8 text-blue" />,
+      title: "Win Them Back",
+      description: "Get a detailed reactivation plan. Keep the report whether you work with us or not."
+    }
+  ];
+
+  const stats = [
+    { number: "20-30%", label: "of customers quietly stop ordering" },
+    { number: "15-25%", label: "annual customer loss for average distributor" },
+    { number: "$50,000+", label: "typical revenue recovered per campaign" }
+  ];
+
+  return (
+    <div className="pt-20">
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div className="max-w-3xl" {...fadeInUp}>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="text-lightest-slate">Stop losing customers</span>
+              <br />
+              <span className="text-blue">you already won.</span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-light-slate mb-8 leading-relaxed">
+              Most distributors have 20-30% of their customer base that quietly stopped ordering. 
+              I help you find that lost revenue and win those customers back.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                to="#contact"
+                className="bg-blue text-navy px-8 py-4 rounded-md font-semibold text-lg hover:bg-blue/90 transition-colors duration-200 text-center"
+              >
+                Get Free Diagnostic
+              </Link>
+              <Link
+                to="/services"
+                className="border border-blue text-blue px-8 py-4 rounded-md font-semibold text-lg hover:bg-blue-tint transition-colors duration-200 text-center"
+              >
+                See How It Works
+              </Link>
             </div>
-
-            <div>
-                <h3 className="text-xl font-bold text-lightest-slate mb-3 group-hover:text-green transition-colors">{project.title}</h3>
-                <div className="text-light-slate text-[17px] leading-relaxed mb-6 line-clamp-4">
-                    {project.shortDescription}
-                </div>
-            </div>
-
-            <ul className="flex flex-wrap gap-3 mt-auto list-none p-0">
-                {project.stats.map((stat, i) => (
-                    <li key={i} className="text-xs font-mono text-slate">
-                        {stat.value}
-                    </li>
-                ))}
-            </ul>
-        </motion.div>
-    );
-};
-
-const Home = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const carouselItems = [...projects, ...projects, ...projects, ...projects];
-    const controls = useAnimationControls();
-
-    // Spotlight Effect
-    useEffect(() => {
-        const updateMousePosition = (e) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
-        window.addEventListener('mousemove', updateMousePosition);
-        return () => window.removeEventListener('mousemove', updateMousePosition);
-    }, []);
-
-    // Infinite Scroll
-    useEffect(() => {
-        controls.start({
-            x: "-50%",
-            transition: {
-                duration: 80,
-                ease: "linear",
-                repeat: Infinity,
-            }
-        });
-    }, [controls]);
-
-    // Stagger Animation Variants
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.3,
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.5,
-                ease: "easeOut"
-            }
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-navy text-slate font-sans relative overflow-x-hidden">
-
-            {/* Spotlight Overlay */}
-            <div
-                className="pointer-events-none fixed inset-0 z-30 transition duration-300 lg:absolute"
-                style={{
-                    background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(29, 78, 216, 0.07), transparent 80%)`
-                }}
-            />
-
-            <div className="relative z-40 flex flex-col min-h-screen max-w-[1600px] mx-auto px-6 md:px-12 lg:px-36">
-
-                {/* Hero Section */}
-                <main className="flex-1 flex flex-col justify-center items-start text-left min-h-screen pb-32">
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="max-w-[1000px]"
-                    >
-                        <motion.div variants={itemVariants} className="font-mono text-green text-base mb-5 ml-1">
-                            Hi, my name is
-                        </motion.div>
-
-                        <motion.h1 variants={itemVariants} className="text-[clamp(40px,8vw,80px)] font-bold text-lightest-slate leading-[1.1] mb-2 tracking-tight">
-                            Mohammed Roowala.
-                        </motion.h1>
-
-                        <motion.h2 variants={itemVariants} className="text-[clamp(40px,8vw,80px)] font-bold text-slate leading-[0.9] mb-8">
-                            I build things for the web.
-                        </motion.h2>
-
-                        <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate max-w-[540px] mb-12 leading-relaxed">
-                            I'm a software engineer specializing in building (and occasionally designing) exceptional digital experiences. Currently, I'm focused on building accessible, human-centered products at <span className="text-green">Anti-Automatons</span>.
-                        </motion.p>
-
-                        <motion.div variants={itemVariants} className="flex gap-5">
-                            <a href="https://github.com/momoroowala" target="_blank" className="px-7 py-4 border border-green text-green font-mono text-[14px] rounded bg-transparent hover:bg-green-tint transition-all duration-300">
-                                Check out my GitHub!
-                            </a>
-                        </motion.div>
-                    </motion.div>
-                </main>
-
-                {/* Projects Section */}
-                <section className="pb-40 w-full overflow-hidden">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        viewport={{ once: true }}
-                        className="flex items-center gap-4 mb-10 w-full max-w-[1000px] mx-auto md:mx-0"
-                    >
-                        <span className="text-green font-mono text-xl md:text-2xl">01.</span>
-                        <h2 className="text-[26px] md:text-[32px] font-bold text-lightest-slate whitespace-nowrap">Some Things I've Built</h2>
-                        <div className="h-[1px] bg-lightest-navy w-[200px] md:w-[300px] ml-4"></div>
-                    </motion.div>
-
-                    <motion.div
-                        className="flex gap-6 w-max hover:cursor-grab active:cursor-grabbing py-10"
-                        animate={controls}
-                        onMouseEnter={() => controls.stop()}
-                        onMouseLeave={() => controls.start({ x: "-50%", transition: { duration: 80, ease: "linear", repeat: Infinity } })}
-                    >
-                        {carouselItems.map((project, index) => (
-                            <NavLink to={`/project/${project.id}`} key={`${project.id}-${index}`}>
-                                <ProjectCard project={project} />
-                            </NavLink>
-                        ))}
-                    </motion.div>
-                </section>
-            </div>
+          </motion.div>
         </div>
-    );
-};
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-light-navy">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-lightest-slate mb-6">
+              The Hidden Revenue Problem
+            </h2>
+            <p className="text-xl text-light-slate max-w-3xl mx-auto">
+              Every distributor is bleeding customers. The question is: how much revenue 
+              are you losing without even knowing it?
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="text-center bg-navy p-8 rounded-lg border border-lightest-navy"
+              >
+                <div className="text-4xl font-bold text-blue mb-2">{stat.number}</div>
+                <div className="text-light-slate">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-lightest-slate mb-6">
+              How It Works
+            </h2>
+            <p className="text-xl text-light-slate max-w-3xl mx-auto">
+              Three simple steps to uncover your lost revenue. No long-term contracts. 
+              No complex software to learn.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="text-center"
+              >
+                <div className="bg-light-navy rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                  {step.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-lightest-slate mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-light-slate">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-center mt-12"
+          >
+            <Link
+              to="#contact"
+              className="inline-flex items-center bg-blue text-navy px-8 py-4 rounded-md font-semibold text-lg hover:bg-blue/90 transition-colors duration-200"
+            >
+              Start Your Free Diagnostic
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="py-20 bg-light-navy">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-lightest-slate mb-8">
+              Zero Risk. Maximum Trust.
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div className="flex items-start space-x-4">
+                <CheckCircle className="w-6 h-6 text-blue mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-semibold text-lightest-slate mb-2">
+                    Your Data Stays Private
+                  </h3>
+                  <p className="text-light-slate">
+                    We never see customer names. All data is anonymized immediately 
+                    and deleted after analysis.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <CheckCircle className="w-6 h-6 text-blue mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-semibold text-lightest-slate mb-2">
+                    Keep Your Report
+                  </h3>
+                  <p className="text-light-slate">
+                    Get a full diagnostic report whether you work with us or not. 
+                    No strings attached.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <CheckCircle className="w-6 h-6 text-blue mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-semibold text-lightest-slate mb-2">
+                    Not Another Software
+                  </h3>
+                  <p className="text-light-slate">
+                    I don't replace your systems. I find the money hiding in the 
+                    data you already have.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <CheckCircle className="w-6 h-6 text-blue mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-xl font-semibold text-lightest-slate mb-2">
+                    One QuickBooks Export
+                  </h3>
+                  <p className="text-light-slate">
+                    That's all I need. No complex integrations or system changes. 
+                    Quick and simple.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Social Proof Placeholder */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-lightest-slate mb-12">
+              Results That Speak for Themselves
+            </h2>
+            
+            <div className="bg-light-navy p-8 rounded-lg border border-lightest-navy max-w-4xl mx-auto">
+              <p className="text-xl text-light-slate italic mb-6">
+                "Case studies and testimonials coming soon. Currently working with select 
+                distributors to build proven results."
+              </p>
+              <div className="text-blue font-semibold">
+                Early Access Program - Limited Spots Available
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section id="contact" className="py-20 bg-light-navy">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-lightest-slate mb-6">
+              Ready to Find Your Lost Revenue?
+            </h2>
+            
+            <p className="text-xl text-light-slate mb-12 max-w-2xl mx-auto">
+              One QuickBooks export. Free diagnostic. See exactly how much revenue 
+              you're losing to dormant customers.
+            </p>
+
+            <div className="space-y-4">
+              <a
+                href="mailto:mo@deeplineops.com"
+                className="inline-flex items-center bg-blue text-navy px-12 py-6 rounded-md font-bold text-xl hover:bg-blue/90 transition-colors duration-200"
+              >
+                <DollarSign className="mr-3 w-6 h-6" />
+                Get Your Free Diagnostic
+              </a>
+              
+              <p className="text-sm text-light-slate">
+                Email: mo@deeplineops.com | Response within 24 hours
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+}
 
 export default Home;

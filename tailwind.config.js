@@ -18,8 +18,8 @@ export default {
                 'light-slate': '#a8b2d1',
                 'lightest-slate': '#ccd6f6',
                 white: '#e6f1ff',
-                green: '#64ffda',
-                'green-tint': 'rgba(100, 255, 218, 0.1)',
+                blue: '#3b82f6',
+                'blue-tint': 'rgba(59, 130, 246, 0.1)',
             }
         },
     },
